@@ -1,0 +1,45 @@
+<!-- templates/admin.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Painel de Administração</h2>
+    <p>Bem-vindo, {{ current_user.username }}! Você tem permissão para gerenciar todos os recursos.</p>
+    
+    <h3>Gestão de Recursos</h3>
+    <p>Gerenciar inventário de equipamentos, veículos e dispositivos de segurança.</p>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h4>Inventário de Equipamentos</h4>
+      </div>
+      <div class="card-body">
+        <button class="btn btn-primary">Adicionar Novo Equipamento</button>
+        <button class="btn btn-danger">Remover Equipamento</button>
+        <button class="btn btn-warning">Atualizar Equipamento</button>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h4>Gestão de Veículos</h4>
+      </div>
+      <div class="card-body">
+        <button class="btn btn-primary">Adicionar Novo Veículo</button>
+        <button class="btn btn-danger">Remover Veículo</button>
+        <button class="btn btn-warning">Atualizar Veículo</button>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h4>Gestão de Dispositivos de Segurança</h4>
+      </div>
+      <div class="card-body">
+        <button class="btn btn-primary">Adicionar Novo Dispositivo</button>
+        <button class="btn btn-danger">Remover Dispositivo</button>
+        <button class="btn btn-warning">Atualizar Dispositivo</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}

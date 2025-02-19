@@ -1,0 +1,110 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Dashboard</h2>
+    <p>Bem-vindo ao painel de controle, {{ current_user.username }}!</p>
+
+
+    <h3 class="mt-4">Visão Geral de Recursos</h3>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4>Equipamentos</h4>
+          </div>
+          <div class="card-body">
+            <p>Total de Equipamentos: 50</p>
+            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-primary">Gerenciar Equipamentos</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h4>Veículos</h4>
+          </div>
+          <div class="card-body">
+            <p>Total de Veículos: 12</p>
+            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-success">Gerenciar Veículos</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header bg-warning text-white">
+            <h4>Dispositivos de Segurança</h4>
+          </div>
+          <div class="card-body">
+            <p>Total de Dispositivos: 25</p>
+            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-warning">Gerenciar Dispositivos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <h3 class="mt-4">Atividades Recentes</h3>
+    <div class="card">
+      <div class="card-header">
+        <h4>Últimas Atividades de Segurança</h4>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Manutenção do Equipamento 123:</strong> Realizada em 15/02/2025</li>
+          <li><strong>Revisão do Veículo 5:</strong> Concluída em 12/02/2025</li>
+          <li><strong>Instalação de Dispositivo de Segurança no Setor 3:</strong> Em andamento</li>
+        </ul>
+        <a href="{{ url_for('auth.gerente_panel') }}" class="btn btn-info">Visualizar Atividades Detalhadas</a>
+      </div>
+    </div>
+
+
+    <h3 class="mt-4">Indicadores de Desempenho</h3>
+    <div class="card">
+      <div class="card-header">
+        <h4>Recursos de Segurança</h4>
+      </div>
+      <div class="card-body">
+        <p>Gráfico sobre a quantidade de recursos de segurança disponíveis e em uso.</p>
+        <!-- Possível inserir gráfico usando Chart.js -->
+        <img src="https://via.placeholder.com/600x300.png" class="img-fluid" alt="Gráfico de Indicadores">
+      </div>
+    </div>
+
+    <h3 class="mt-4">Tabela de Recursos</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nome do Recurso</th>
+          <th scope="col">Status</th>
+          <th scope="col">Última Atualização</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Equipamento 001</td>
+          <td>Ativo</td>
+          <td>15/02/2025</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Veículo 005</td>
+          <td>Em Revisão</td>
+          <td>12/02/2025</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Dispositivo 003</td>
+          <td>Instalado</td>
+          <td>14/02/2025</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
