@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User
+from extensions import db
+from models import User
 from forms import LoginForm, RegisterForm
 from functools import wraps
+
 
 bp = Blueprint('auth', __name__)
 
@@ -73,6 +75,6 @@ def admin_panel():
 
 @bp.route("/gerente_panel")
 @login_required
-@role_required("gerente" and "administrador")
+@role_required("gerente")
 def gerente_panel():
     return render_template("gerente_panel.html")

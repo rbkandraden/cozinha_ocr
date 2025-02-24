@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header" style="background-color: #2c2322;">
+        <h2 class="mb-0" style="color: #ceb9af;">
+          <i class="fas fa-boxes"></i> Estoque
+        </h2>
+      </div>
+      <div class="card-body" style="background-color: #ffffff;">
+        <p class="lead" style="color: #2c2322;">
+          Gerencie os ingredientes disponíveis no estoque da cozinha.
+        </p>
+
+        <!-- Estoque -->
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered" style="background-color: white; color: #2c2322;">
+            <thead style="background-color: #7b5b4a;">
+              <tr>
+                <th style="color: #ceb9af;">ID</th>
+                <th style="color: #ceb9af;">Ingrediente</th>
+                <th style="color: #ceb9af;">Quantidade Mínima</th>
+                <th style="color: #ceb9af;">Estoque Atual</th>
+                <th style="color: #ceb9af;">Unidade</th>
+                <th style="color: #ceb9af;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in itens %}
+                <tr>
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.nome }}</td>
+                  <td>{{ item.quantidade_minima }} {{ item.unidade }}</td>
+                  <td>
+                    <form method="POST" action="{{ url_for('dashboard.atualizar_estoque', item_id=item.id) }}" class="d-flex align-items-center">
+                      <input type="number" 
+                             name="quantidade_atual" 
+                             class="form-control form-control-sm" 
+                             value="{{ item.quantidade_atual }}" 
+                             style="width: 100px; margin-right: 10px;">
+                      <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                      </button>
+                    </form>
+                  </td>
+                  <td>{{ item.unidade }}</td>
+                  <td>
+                    <a href="{{ url_for('dashboard.editar_item', item_id=item.id) }}" class="btn btn-sm">
+                       style="background-color: #2c2322; color: #ceb9af;" 
+                       title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="POST" action="{{ url_for('dashboard.remover_item', item_id=item.id) }}" style="display:inline;">
+                      <button type="submit" 
+                              class="btn btn-sm" 
+                              style="background-color: #948c8c; color: #2c2322;" 
+                              title="Remover"
+                              onclick="return confirm('Tem certeza que deseja remover este item?');">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              <!-- Itens Adicionais -->
+              <tr>
+                <td>10</td>
+                <td>Farinha de Trigo</td>
+                <td>10 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="15" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>Fermento em Pó</td>
+                <td>2 UND</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="5" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>UND</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td>Chocolate em Pó</td>
+                <td>5 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="8" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td>Leite Condensado</td>
+                <td>6 UND</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="10" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>UND</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td>Manteiga</td>
+                <td>3 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="4" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td>Ovos</td>
+                <td>24 UND</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="30" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>UND</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td>Baunilha</td>
+                <td>1 UND</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="2" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>UND</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td>Sal</td>
+                <td>1 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="3" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>18</td>
+                <td>Açúcar Mascavo</td>
+                <td>5 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="7" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>19</td>
+                <td>Canela em Pó</td>
+                <td>1 KG</td>
+                <td>
+                  <form method="POST" action="#" class="d-flex align-items-center">
+                    <input type="number" 
+                           name="quantidade_atual" 
+                           class="form-control form-control-sm" 
+                           value="2" 
+                           style="width: 100px; margin-right: 10px;">
+                    <button type="submit" class="btn btn-sm" style="background-color: #7b5b4a; color: #ceb9af;">
+                      <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                  </form>
+                </td>
+                <td>KG</td>
+                <td>
+                  <a href="#" 
+                     class="btn btn-sm" 
+                     style="background-color: #2c2322; color: #ceb9af;" 
+                     title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" action="#" style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm" 
+                            style="background-color: #948c8c; color: #2c2322;" 
+                            title="Remover"
+                            onclick="return confirm('Tem certeza que deseja remover este item?');">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Botão para Adicionar Novo Item -->
+        <div class="mt-4">
+          <a href="{{ url_for('dashboard.adicionar_item') }}" 
+             class="btn" 
+             style="background-color: #2c2322; color: #ceb9af;">
+            <i class="fas fa-plus-circle"></i> Adicionar Novo Ingrediente
+          </a>
+        </div>
+        <!-- Adicione esta seção após o botão "Adicionar Novo Ingrediente" -->
+<div class="mt-4">
+  <h4 style="color: #2c2322;">Upload de Foto</h4>
+  <form action="{{ url_for('dashboard.upload_foto') }}" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="file" style="color: #2c2322;">Selecione uma foto:</label>
+      <input type="file" class="form-control-file" name="file" accept="image/*" required>
+    </div>
+    <button type="submit" class="btn" style="background-color: #7b5b4a; color: #ceb9af;">
+      <i class="fas fa-upload"></i> Enviar Foto
+    </button>
+  </form>
+</div>
+
+<!-- Exibir mensagens de flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} mt-3">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

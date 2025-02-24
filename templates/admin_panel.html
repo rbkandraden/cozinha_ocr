@@ -2,43 +2,97 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container mt-4">
-    <h2>Painel de Administração</h2>
-    <p>Bem-vindo, {{ current_user.username }}! Você tem permissão para gerenciar todos os recursos.</p>
-    
-    <h3>Gestão de Recursos</h3>
-    <p>Gerenciar inventário de equipamentos, veículos e dispositivos de segurança.</p>
+  <div class="container mt-4" style="background-color: rgba(44, 35, 34, 0.9); border-radius: 10px; padding: 20px;">
+    <h2 style="color: var(--cor-secundaria); border-bottom: 2px solid var(--cor-terciaria); padding-bottom: 10px;">
+      Painel de Administração da Cozinha
+    </h2>
+    <p style="color: var(--cor-primaria);">
+      Bem-vindo, {{ current_user.username }}! Você tem permissão para gerenciar todo o estoque da cozinha.
+    </p>
 
-    <div class="card mt-4">
-      <div class="card-header">
-        <h4>Inventário de Equipamentos</h4>
+    <!-- Seção de Ingredientes -->
+    <div class="card mt-4" style="background-color: var(--cor-fundo); border: 2px solid var(--cor-secundaria);">
+      <div class="card-header" style="background-color: var(--cor-secundaria);">
+        <h4 style="color: var(--cor-primaria); margin: 0;">
+          <i class="fas fa-utensils"></i> Gestão de Ingredientes
+        </h4>
       </div>
-      <div class="card-body">
-        <button class="btn btn-primary">Adicionar Novo Equipamento</button>
-        <button class="btn btn-danger">Remover Equipamento</button>
-        <button class="btn btn-warning">Atualizar Equipamento</button>
+      <div class="card-body" style="padding: 20px;">
+        <button class="btn" style="
+          background-color: var(--cor-secundaria);
+          color: var(--cor-primaria);
+          border: 1px solid var(--cor-secundaria);
+          margin-right: 10px;
+        ">
+          <i class="fas fa-plus-circle"></i> Novo Ingrediente
+        </button>
+        <button class="btn" style="
+          background-color: var(--cor-quaternaria);
+          color: var(--cor-fundo);
+          border: 1px solid var(--cor-quaternaria);
+          margin-right: 10px;
+        ">
+          <i class="fas fa-trash-alt"></i> Remover Ingrediente
+        </button>
+        <button class="btn" style="
+          background-color: var(--cor-terciaria);
+          color: var(--cor-fundo);
+          border: 1px solid var(--cor-terciaria);
+        ">
+          <i class="fas fa-sync-alt"></i> Atualizar Estoque
+        </button>
       </div>
     </div>
 
-    <div class="card mt-4">
-      <div class="card-header">
-        <h4>Gestão de Veículos</h4>
+    <!-- Seção de Utensílios -->
+    <div class="card mt-4" style="background-color: var(--cor-fundo); border: 2px solid var(--cor-secundaria);">
+      <div class="card-header" style="background-color: var(--cor-secundaria);">
+        <h4 style="color: var(--cor-primaria); margin: 0;">
+          <i class="fas fa-blender"></i> Controle de Utensílios
+        </h4>
       </div>
-      <div class="card-body">
-        <button class="btn btn-primary">Adicionar Novo Veículo</button>
-        <button class="btn btn-danger">Remover Veículo</button>
-        <button class="btn btn-warning">Atualizar Veículo</button>
+      <div class="card-body" style="padding: 20px;">
+        <button class="btn" style="
+          background-color: var(--cor-secundaria);
+          color: var(--cor-primaria);
+          border: 1px solid var(--cor-secundaria);
+          margin-right: 10px;
+        ">
+          <i class="fas fa-plus-circle"></i> Adicionar Utensílio
+        </button>
+        <button class="btn" style="
+          background-color: var(--cor-quaternaria);
+          color: var(--cor-fundo);
+          border: 1px solid var(--cor-quaternaria);
+        ">
+          <i class="fas fa-clipboard-list"></i> Gerar Relatório
+        </button>
       </div>
     </div>
 
-    <div class="card mt-4">
-      <div class="card-header">
-        <h4>Gestão de Dispositivos de Segurança</h4>
+    <!-- Seção de Equipamentos -->
+    <div class="card mt-4" style="background-color: var(--cor-fundo); border: 2px solid var(--cor-secundaria);">
+      <div class="card-header" style="background-color: var(--cor-secundaria);">
+        <h4 style="color: var(--cor-primaria); margin: 0;">
+          <i class="fas fa-temperature-high"></i> Manutenção de Equipamentos
+        </h4>
       </div>
-      <div class="card-body">
-        <button class="btn btn-primary">Adicionar Novo Dispositivo</button>
-        <button class="btn btn-danger">Remover Dispositivo</button>
-        <button class="btn btn-warning">Atualizar Dispositivo</button>
+      <div class="card-body" style="padding: 20px;">
+        <button class="btn" style="
+          background-color: var(--cor-secundaria);
+          color: var(--cor-primaria);
+          border: 1px solid var(--cor-secundaria);
+          margin-right: 10px;
+        ">
+          <i class="fas fa-tools"></i> Agendar Manutenção
+        </button>
+        <button class="btn" style="
+          background-color: var(--cor-terciaria);
+          color: var(--cor-fundo);
+          border: 1px solid var(--cor-terciaria);
+        ">
+          <i class="fas fa-history"></i> Histórico de Serviços
+        </button>
       </div>
     </div>
   </div>

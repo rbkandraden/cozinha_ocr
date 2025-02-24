@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Adicionar Item</h2>
+    <!-- Exibir mensagens de flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label for="nome">Nome do Item</label>
+        <input type="text" class="form-control" id="nome" name="nome" required>
+      </div>
+      <div class="form-group">
+        <label for="quantidade_minima">Quantidade Mínima</label>
+        <input type="number" class="form-control" id="quantidade_minima" name="quantidade_minima" step="0.1" required>
+      </div>
+      <div class="form-group">
+        <label for="quantidade_atual">Quantidade Atual</label>
+        <input type="number" class="form-control" id="quantidade_atual" name="quantidade_atual" step="0.1" required>
+      </div>
+      <div class="form-group">
+        <label for="unidade">Unidade de Medida</label>
+        <input type="text" class="form-control" id="unidade" name="unidade" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Adicionar</button>
+      <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+
+  <div class="container mt-4 custom-container">  <!-- Adicione a classe custom-container -->
+    <h2>Adicionar Item</h2>
+    <!-- Exibir mensagens de flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  
+    <form method="POST">
+      <div class="form-group">
+        <label for="nome">Nome do Item</label>
+        <input type="text" class="form-control" id="nome" name="nome" required>
+      </div>
+      <div class="form-group">
+        <label for="quantidade_minima">Quantidade Mínima</label>
+        <input type="number" class="form-control" id="quantidade_minima" name="quantidade_minima" step="0.1" required>
+      </div>
+      <div class="form-group">
+        <label for="quantidade_atual">Quantidade Atual</label>
+        <input type="number" class="form-control" id="quantidade_atual" name="quantidade_atual" step="0.1" required>
+      </div>
+      <div class="form-group">
+        <label for="unidade">Unidade de Medida</label>
+        <input type="text" class="form-control" id="unidade" name="unidade" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Adicionar</button>
+      <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+{% endblock %}

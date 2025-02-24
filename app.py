@@ -1,35 +1,51 @@
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 import os
-from models import db, User, bcrypt  
+from extensions import configure_extensions, db
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wayne_security.db'
+def create_app():
+    app = Flask(__name__)
+    
+    # Configurações
+    app.config.update({
+        'SECRET_KEY': os.getenv('SECRET_KEY', 'dev-key-123'),
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///wayne_security.db',
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        'ALLOWED_EXTENSIONS': {'png', 'jpg', 'jpeg', 'gif'},
+        'UPLOAD_FOLDER': 'static/uploads'
+    })
 
+    # Inicializar banco de dados
+    db.init_app(app)
 
-db.init_app(app)
-bcrypt.init_app(app)
+    # Inicializar LoginManager
+    login_manager = LoginManager()
+    login_manager.init_app(app)
 
-login_manager = LoginManager(app)
-login_manager.login_view = 'auth.login'
+    # Definir user_loader
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    # Registrar blueprints e criar tabelas
+    with app.app_context():
+        from models import User, Item
+        from routes.auth import bp as auth_bp
+        from routes.dashboard import dashboard_bp
+        
+        db.create_all()
+        
+        app.register_blueprint(auth_bp, url_prefix='/auth')
+        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 
+    @app.route('/')
+    def index():
+        return redirect(url_for('auth.login'))
 
-from routes.auth import bp as auth_bp
-from routes.dashboard import bp as dashboard_bp
+    return app
 
-app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-
-@app.route("/")
-def index():
-    return redirect(url_for("auth.login"))
+app = create_app()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  
     app.run(debug=True)

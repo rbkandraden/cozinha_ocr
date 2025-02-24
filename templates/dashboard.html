@@ -1,110 +1,137 @@
-<!-- templates/dashboard.html -->
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-  <div class="container mt-4">
-    <h2>Dashboard</h2>
-    <p>Bem-vindo ao painel de controle, {{ current_user.username }}!</p>
-
-
-    <h3 class="mt-4">Visão Geral de Recursos</h3>
+<div class="dashboard-container">
     <div class="row">
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-primary text-white">
-            <h4>Equipamentos</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Equipamentos: 50</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-primary">Gerenciar Equipamentos</a>
-          </div>
+        <!-- Coluna de Estatísticas -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Estatísticas do Estoque</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Exibir o total de itens -->
+                    <p>Total de Itens: <strong>{{ total_itens }}</strong></p>
+                    <!-- Exibir itens abaixo do mínimo -->
+                    <p>Itens Abaixo do Mínimo: <strong>{{ itens_abaixo_minimo }}</strong></p>
+                    <!-- Exibir itens para repor -->
+                    <p>Itens para Repor: <strong>{{ itens_para_repor }}</strong></p>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h4>Veículos</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Veículos: 12</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-success">Gerenciar Veículos</a>
-          </div>
+        <!-- Coluna de Ações Rápidas -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Botão para adicionar item -->
+                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-primary w-100 mb-2">Adicionar Item</a>
+                    <!-- Botão para ver o estoque -->
+                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary w-100 mb-2">Ver Estoque</a>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-warning text-white">
-            <h4>Dispositivos de Segurança</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Dispositivos: 25</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-warning">Gerenciar Dispositivos</a>
-          </div>
+        <!-- Coluna de Notificações -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Notificações</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Verifica se há itens abaixo do mínimo -->
+                    {% if itens_abaixo_minimo > 0 %}
+                        <div class="alert alert-danger">
+                            <strong>Atenção!</strong> {{ itens_abaixo_minimo }} itens estão abaixo do estoque mínimo.
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <strong>Tudo certo!</strong> Nenhum item está abaixo do estoque mínimo.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
+    <!-- Seção de Upload e Processamento de Tabelas -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Upload de Tabela de Insumos</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Formulário de Upload -->
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="file">Selecione uma imagem da tabela:</label>
+                            <input type="file" class="form-control-file" name="file" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </form>
 
-    <h3 class="mt-4">Atividades Recentes</h3>
-    <div class="card">
-      <div class="card-header">
-        <h4>Últimas Atividades de Segurança</h4>
-      </div>
-      <div class="card-body">
-        <ul>
-          <li><strong>Manutenção do Equipamento 123:</strong> Realizada em 15/02/2025</li>
-          <li><strong>Revisão do Veículo 5:</strong> Concluída em 12/02/2025</li>
-          <li><strong>Instalação de Dispositivo de Segurança no Setor 3:</strong> Em andamento</li>
-        </ul>
-        <a href="{{ url_for('auth.gerente_panel') }}" class="btn btn-info">Visualizar Atividades Detalhadas</a>
-      </div>
+                    <!-- Área para exibir os dados processados -->
+                    <div id="result" class="mt-4">
+                        <h6>Dados Processados:</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Mínimo</th>
+                                    <th>Contagem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTableBody">
+                                <!-- Dados serão preenchidos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
+<!-- Script para processar o upload via AJAX -->
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('file', document.querySelector('input[type="file"]').files[0]);
 
-    <h3 class="mt-4">Indicadores de Desempenho</h3>
-    <div class="card">
-      <div class="card-header">
-        <h4>Recursos de Segurança</h4>
-      </div>
-      <div class="card-body">
-        <p>Gráfico sobre a quantidade de recursos de segurança disponíveis e em uso.</p>
-        <!-- Possível inserir gráfico usando Chart.js -->
-        <img src="https://via.placeholder.com/600x300.png" class="img-fluid" alt="Gráfico de Indicadores">
-      </div>
-    </div>
+        try {
+            const response = await fetch('/dashboard/upload_tabela', {
+                                method: 'POST',
+                body: formData
+            });
 
-    <h3 class="mt-4">Tabela de Recursos</h3>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nome do Recurso</th>
-          <th scope="col">Status</th>
-          <th scope="col">Última Atualização</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Equipamento 001</td>
-          <td>Ativo</td>
-          <td>15/02/2025</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Veículo 005</td>
-          <td>Em Revisão</td>
-          <td>12/02/2025</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Dispositivo 003</td>
-          <td>Instalado</td>
-          <td>14/02/2025</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+            const result = await response.json();
+
+            // Limpar a tabela antes de adicionar novos dados
+            const tableBody = document.getElementById('resultTableBody');
+            tableBody.innerHTML = '';
+
+            // Preencher a tabela com os dados processados
+            result.dados.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.codigo}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.minimo}</td>
+                    <td>${item.contagem}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao processar o upload:', error);
+            alert('Erro ao processar o upload. Tente novamente.');
+        }
+    });
+</script>
+
 {% endblock %}
