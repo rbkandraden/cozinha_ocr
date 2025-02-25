@@ -13,9 +13,10 @@ def create_app():
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///wayne_security.db',
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
         'ALLOWED_EXTENSIONS': {'png', 'jpg', 'jpeg', 'gif'},
-        'UPLOAD_FOLDER': 'static/uploads'
+        'UPLOAD_FOLDER': os.path.join('routes', 'temp_uploads'),
+        'MAX_CONTENT_LENGTH': 16 * 1024 * 1024  # 16MB
     })
-
+   
     # Inicializar banco de dados
     db.init_app(app)
 

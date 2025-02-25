@@ -10,11 +10,8 @@
                     <h5>Estatísticas do Estoque</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Exibir o total de itens -->
                     <p>Total de Itens: <strong>{{ total_itens }}</strong></p>
-                    <!-- Exibir itens abaixo do mínimo -->
                     <p>Itens Abaixo do Mínimo: <strong>{{ itens_abaixo_minimo }}</strong></p>
-                    <!-- Exibir itens para repor -->
                     <p>Itens para Repor: <strong>{{ itens_para_repor }}</strong></p>
                 </div>
             </div>
@@ -27,10 +24,12 @@
                     <h5>Ações Rápidas</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Botão para adicionar item -->
-                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-primary w-100 mb-2">Adicionar Item</a>
-                    <!-- Botão para ver o estoque -->
-                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary w-100 mb-2">Ver Estoque</a>
+                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-plus-circle"></i> Adicionar Item
+                    </a>
+                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary w-100 mb-2">
+                        <i class="fas fa-boxes"></i> Ver Estoque
+                    </a>
                 </div>
             </div>
         </div>
@@ -42,14 +41,15 @@
                     <h5>Notificações</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Verifica se há itens abaixo do mínimo -->
                     {% if itens_abaixo_minimo > 0 %}
                         <div class="alert alert-danger">
-                            <strong>Atenção!</strong> {{ itens_abaixo_minimo }} itens estão abaixo do estoque mínimo.
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            {{ itens_abaixo_minimo }} itens críticos!
                         </div>
                     {% else %}
                         <div class="alert alert-success">
-                            <strong>Tudo certo!</strong> Nenhum item está abaixo do estoque mínimo.
+                            <i class="fas fa-check-circle"></i> 
+                            Estoque dentro dos parâmetros
                         </div>
                     {% endif %}
                 </div>
@@ -57,39 +57,45 @@
         </div>
     </div>
 
-    <!-- Seção de Upload e Processamento de Tabelas -->
+    <!-- Seção de Upload -->
     <div class="row">
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5>Upload de Tabela de Insumos</h5>
+                    <h5><i class="fas fa-file-upload"></i> Atualização via OCR</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Formulário de Upload -->
                     <form id="uploadForm" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="file">Selecione uma imagem da tabela:</label>
-                            <input type="file" class="form-control-file" name="file" accept="image/*" required>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="file" 
+                                    id="fileInput" accept="image/png, image/jpeg" required>
+                                <label class="custom-file-label" for="fileInput">Selecione a imagem da tabela</label>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Processar Tabela
+                        </button>
                     </form>
 
-                    <!-- Área para exibir os dados processados -->
-                    <div id="result" class="mt-4">
-                        <h6>Dados Processados:</h6>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nome</th>
-                                    <th>Mínimo</th>
-                                    <th>Contagem</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultTableBody">
-                                <!-- Dados serão preenchidos via JavaScript -->
-                            </tbody>
-                        </table>
+                    <!-- Resultado do Processamento -->
+                    <div id="processingResult" class="mt-4" style="display: none;">
+                        <h6><i class="fas fa-table"></i> Dados Detectados:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Estoque Mínimo</th>
+                                        <th>Estoque Atual</th>
+                                        <th>Unidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="uploadStatus" class="mt-3"></div>
                     </div>
                 </div>
             </div>
@@ -97,41 +103,75 @@
     </div>
 </div>
 
-<!-- Script para processar o upload via AJAX -->
+<!-- Scripts de Processamento -->
 <script>
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('file', document.querySelector('input[type="file"]').files[0]);
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    
+    // Atualizar label do arquivo
+    fileInput.addEventListener('change', (e) => {
+        const fileName = e.target.files[0]?.name || 'Selecione um arquivo';
+        document.querySelector('.custom-file-label').textContent = fileName;
+    });
 
+    // Envio do formulário
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const resultDiv = document.getElementById('processingResult');
+        const statusDiv = document.getElementById('uploadStatus');
+        
         try {
+            statusDiv.innerHTML = '<div class="alert alert-info">Processando imagem...</div>';
+            resultDiv.style.display = 'none';
+
             const response = await fetch('/dashboard/upload_tabela', {
-                                method: 'POST',
+                method: 'POST',
                 body: formData
             });
 
             const result = await response.json();
+            
+            if(result.success) {
+                // Exibir dados processados
+                const tbody = document.getElementById('resultBody');
+                tbody.innerHTML = result.data.map(item => `
+                    <tr>
+                        <td>${item.nome}</td>
+                        <td>${item.quantidade_minima} ${item.unidade}</td>
+                        <td>${item.quantidade_atual} ${item.unidade}</td>
+                        <td>${item.unidade}</td>
+                    </tr>
+                `).join('');
 
-            // Limpar a tabela antes de adicionar novos dados
-            const tableBody = document.getElementById('resultTableBody');
-            tableBody.innerHTML = '';
-
-            // Preencher a tabela com os dados processados
-            result.dados.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.codigo}</td>
-                    <td>${item.nome}</td>
-                    <td>${item.minimo}</td>
-                    <td>${item.contagem}</td>
+                // Exibir status
+                statusDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        ${result.updated} itens processados com sucesso!
+                        ${result.data.length - result.updated > 0 ? 
+                            `(${result.data.length - result.updated} novos itens)` : ''}
+                    </div>
                 `;
-                tableBody.appendChild(row);
-            });
+                resultDiv.style.display = 'block';
+                
+                // Atualizar a página após 3 segundos
+                setTimeout(() => window.location.reload(), 3000);
+                
+            } else {
+                throw new Error(result.error || 'Erro desconhecido');
+            }
+            
         } catch (error) {
-            console.error('Erro ao processar o upload:', error);
-            alert('Erro ao processar o upload. Tente novamente.');
+            console.error('Erro:', error);
+            statusDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Erro:</strong> ${error.message}
+                </div>
+            `;
+            resultDiv.style.display = 'none';
         }
     });
+});
 </script>
-
 {% endblock %}

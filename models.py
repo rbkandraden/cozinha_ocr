@@ -1,3 +1,4 @@
+from datetime import datetime  # Importação necessária para o campo datetime
 from extensions import db, bcrypt
 from flask_login import UserMixin
 
@@ -15,7 +16,11 @@ class User(db.Model, UserMixin):
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
+    nome = db.Column(db.String(100), nullable=False, unique=True)
     quantidade_minima = db.Column(db.Float, nullable=False)
     quantidade_atual = db.Column(db.Float, nullable=False)
-    unidade = db.Column(db.String(20), nullable=False)
+    unidade = db.Column(db.String(10), nullable=False)
+    data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow)  # Corrigido
+
+    def __repr__(self):
+        return f'<Item {self.nome}>'
