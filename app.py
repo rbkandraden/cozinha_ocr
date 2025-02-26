@@ -1,45 +1,47 @@
 from flask import Flask, redirect, url_for
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 import os
-from extensions import configure_extensions, db
+from extensions import db, configure_extensions
 
 def create_app():
     app = Flask(__name__)
     
-    # Configurações
+    # Configurações essenciais
     app.config.update({
         'SECRET_KEY': os.getenv('SECRET_KEY', 'dev-key-123'),
-        'SQLALCHEMY_DATABASE_URI': 'sqlite:///wayne_security.db',
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + os.path.join(app.instance_path, 'wayne_security.db'),
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
         'ALLOWED_EXTENSIONS': {'png', 'jpg', 'jpeg', 'gif'},
-        'UPLOAD_FOLDER': os.path.join('routes', 'temp_uploads'),
+        'UPLOAD_FOLDER': os.path.join(app.root_path, 'static', 'uploads'),
         'MAX_CONTENT_LENGTH': 16 * 1024 * 1024  # 16MB
     })
-   
-    # Inicializar banco de dados
-    db.init_app(app)
 
-    # Inicializar LoginManager
-    login_manager = LoginManager()
-    login_manager.init_app(app)
+    # Configurar extensões
+    configure_extensions(app)
 
-    # Definir user_loader
-    @login_manager.user_loader
-    def load_user(user_id):
-        return db.session.get(User, int(user_id))
-
-    # Registrar blueprints e criar tabelas
+    # Garantir estrutura de pastas
     with app.app_context():
+        # Criar pastas necessárias
+        required_folders = [
+            app.instance_path,
+            app.config['UPLOAD_FOLDER'],
+            os.path.join(app.root_path, 'temp_uploads')
+        ]
+        
+        for folder in required_folders:
+            os.makedirs(folder, exist_ok=True)
+
+        # Inicializar banco de dados
         from models import User, Item
+        db.create_all()
+
+        # Registrar blueprints
         from routes.auth import bp as auth_bp
         from routes.dashboard import dashboard_bp
-        
-        db.create_all()
         
         app.register_blueprint(auth_bp, url_prefix='/auth')
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 
+    # Rota principal
     @app.route('/')
     def index():
         return redirect(url_for('auth.login'))

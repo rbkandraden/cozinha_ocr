@@ -2,21 +2,15 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 import os
 from werkzeug.utils import secure_filename
 from flask_login import login_required
-from extensions import db
+from datetime import datetime
+from extensions import db, allowed_file
 from models import Item
 from ocr_processor import OCRProcessor
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-# Configurações
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
 TESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# Rotas principais
 @dashboard_bp.route('/')
 @login_required
 def dashboard():
@@ -86,7 +80,7 @@ def remover_item(item_id):
         flash(f'Erro ao remover item: {str(e)}', 'danger')
     return redirect(url_for('dashboard.estoque'))
 
-# Upload e OCR
+# Upload e OCR (Correção de transação e regex)
 @dashboard_bp.route('/upload_tabela', methods=['POST'])
 @login_required
 def upload_tabela():
@@ -95,8 +89,9 @@ def upload_tabela():
         return redirect(url_for('dashboard.estoque'))
 
     file = request.files['file']
-    if not file or file.filename == '':
-        flash('Arquivo inválido', 'danger')
+    
+    if file.filename == '':
+        flash('Nenhum arquivo selecionado', 'danger')
         return redirect(url_for('dashboard.estoque'))
 
     if not allowed_file(file.filename):
@@ -104,63 +99,89 @@ def upload_tabela():
         return redirect(url_for('dashboard.estoque'))
 
     try:
-        # Configurar pasta temporária
         upload_folder = os.path.join(current_app.root_path, 'temp_uploads')
         os.makedirs(upload_folder, exist_ok=True)
         
-        # Salvar arquivo temporário
         filename = secure_filename(file.filename)
         filepath = os.path.join(upload_folder, filename)
         file.save(filepath)
 
-        # Processar OCR
         ocr = OCRProcessor(TESSERACT_PATH)
         df = ocr.process_inventory_table(filepath)
 
-        # Atualizar banco de dados
-        with db.session.begin():
+        if df.empty:
+            flash('Nenhum dado válido detectado na tabela', 'warning')
+            return redirect(url_for('dashboard.estoque'))
+
+        atualizados = 0
+        novos_itens = 0
+
+        try:
             for _, row in df.iterrows():
                 item = Item.query.filter_by(nome=row['nome']).first()
                 
                 if item:
-                    # Atualizar item existente
                     item.quantidade_minima = row['quantidade_minima']
                     item.quantidade_atual = row['quantidade_atual']
                     item.unidade = row['unidade']
+                    item.data_atualizacao = datetime.utcnow()
+                    atualizados += 1
                 else:
-                    # Criar novo item
-                    db.session.add(Item(
+                    novo_item = Item(
                         nome=row['nome'],
                         quantidade_minima=row['quantidade_minima'],
                         quantidade_atual=row['quantidade_atual'],
                         unidade=row['unidade']
-                    ))
-        
-        db.session.commit()
+                    )
+                    db.session.add(novo_item)
+                    novos_itens += 1
+
+            db.session.commit()
+            
+        except Exception as e:
+            db.session.rollback()
+            raise
+
         os.remove(filepath)
-        flash(f'{len(df)} itens processados ({(len(df) - Item.query.count())} novos)', 'success')
+        
+        flash(
+            f'Tabela processada! Itens detectados: {len(df)} | '
+            f'Atualizados: {atualizados} | Novos: {novos_itens}', 
+            'success'
+        )
 
     except Exception as e:
-        db.session.rollback()
         flash(f'Erro no processamento: {str(e)}', 'danger')
+        current_app.logger.error(f'Erro no upload: {str(e)}', exc_info=True)
+        
         if 'filepath' in locals() and os.path.exists(filepath):
             os.remove(filepath)
 
     return redirect(url_for('dashboard.estoque'))
 
-@dashboard_bp.route('/atualizar_estoque/<int:item_id>', methods=['POST'])
+@dashboard_bp.route('/upload_foto', methods=['POST'])
 @login_required
-def atualizar_estoque(item_id):
-    item = Item.query.get_or_404(item_id)
-    try:
-        nova_quantidade = float(request.form.get('quantidade_atual', 0))
-        if nova_quantidade < 0:
-            raise ValueError("Quantidade negativa")
-            
-        item.quantidade_atual = nova_quantidade
-        db.session.commit()
-        flash('Estoque atualizado com sucesso!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Erro na atualização: {str(e)}', 'danger')
+def upload_foto():
+    if 'foto' not in request.files:
+        flash('Nenhum arquivo enviado', 'error')
+        return redirect(url_for('dashboard.estoque'))
+    
+    file = request.files['foto']
+    
+    if file.filename == '':
+        flash('Nenhum arquivo selecionado', 'error')
+        return redirect(url_for('dashboard.estoque'))
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join(
+            current_app.config['UPLOAD_FOLDER'],
+            filename
+        )
+        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+        file.save(upload_path)
+        flash('Foto enviada com sucesso', 'success')
+    else:
+        flash('Tipo de arquivo não permitido', 'error')
+    
     return redirect(url_for('dashboard.estoque'))

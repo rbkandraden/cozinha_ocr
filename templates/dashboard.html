@@ -1,177 +1,65 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="row">
-        <!-- Coluna de Estatísticas -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Estatísticas do Estoque</h5>
+<div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Card de Estatísticas -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estatísticas</h5>
                 </div>
                 <div class="card-body">
-                    <p>Total de Itens: <strong>{{ total_itens }}</strong></p>
-                    <p>Itens Abaixo do Mínimo: <strong>{{ itens_abaixo_minimo }}</strong></p>
-                    <p>Itens para Repor: <strong>{{ itens_para_repor }}</strong></p>
+                    <dl class="row">
+                        <dt class="col-8">Total de Itens:</dt>
+                        <dd class="col-4 text-end">{{ total_itens }}</dd>
+
+                        <dt class="col-8">Itens Abaixo do Mínimo:</dt>
+                        <dd class="col-4 text-end text-danger">{{ itens_abaixo_minimo }}</dd>
+
+                        <dt class="col-8">Itens para Repor:</dt>
+                        <dd class="col-4 text-end text-warning">{{ itens_para_repor }}</dd>
+                    </dl>
                 </div>
             </div>
         </div>
 
-        <!-- Coluna de Ações Rápidas -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Ações Rápidas</h5>
+        <!-- Card de Ações Rápidas -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Ações Rápidas</h5>
                 </div>
-                <div class="card-body">
-                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-primary w-100 mb-2">
-                        <i class="fas fa-plus-circle"></i> Adicionar Item
+                <div class="card-body d-grid gap-2">
+                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-outline-success">
+                        <i class="fas fa-plus-circle"></i> Novo Item
                     </a>
-                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-secondary w-100 mb-2">
+                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-outline-primary">
                         <i class="fas fa-boxes"></i> Ver Estoque
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Coluna de Notificações -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Notificações</h5>
+        <!-- Card de Uploads -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-import"></i> Atualização por OCR</h5>
                 </div>
                 <div class="card-body">
-                    {% if itens_abaixo_minimo > 0 %}
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle"></i> 
-                            {{ itens_abaixo_minimo }} itens críticos!
+                    <form action="{{ url_for('dashboard.upload_tabela') }}" method="POST" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <input type="file" class="form-control" name="file" accept="image/*" required>
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-upload"></i> Enviar
+                            </button>
                         </div>
-                    {% else %}
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> 
-                            Estoque dentro dos parâmetros
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Seção de Upload -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-file-upload"></i> Atualização via OCR</h5>
-                </div>
-                <div class="card-body">
-                    <form id="uploadForm" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" name="file" 
-                                    id="fileInput" accept="image/png, image/jpeg" required>
-                                <label class="custom-file-label" for="fileInput">Selecione a imagem da tabela</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> Processar Tabela
-                        </button>
+                        <small class="form-text text-muted">Formatos aceitos: PNG, JPG, JPEG</small>
                     </form>
-
-                    <!-- Resultado do Processamento -->
-                    <div id="processingResult" class="mt-4" style="display: none;">
-                        <h6><i class="fas fa-table"></i> Dados Detectados:</h6>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>Item</th>
-                                        <th>Estoque Mínimo</th>
-                                        <th>Estoque Atual</th>
-                                        <th>Unidade</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="resultBody">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="uploadStatus" class="mt-3"></div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Scripts de Processamento -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('uploadForm');
-    const fileInput = document.getElementById('fileInput');
-    
-    // Atualizar label do arquivo
-    fileInput.addEventListener('change', (e) => {
-        const fileName = e.target.files[0]?.name || 'Selecione um arquivo';
-        document.querySelector('.custom-file-label').textContent = fileName;
-    });
-
-    // Envio do formulário
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const resultDiv = document.getElementById('processingResult');
-        const statusDiv = document.getElementById('uploadStatus');
-        
-        try {
-            statusDiv.innerHTML = '<div class="alert alert-info">Processando imagem...</div>';
-            resultDiv.style.display = 'none';
-
-            const response = await fetch('/dashboard/upload_tabela', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-            
-            if(result.success) {
-                // Exibir dados processados
-                const tbody = document.getElementById('resultBody');
-                tbody.innerHTML = result.data.map(item => `
-                    <tr>
-                        <td>${item.nome}</td>
-                        <td>${item.quantidade_minima} ${item.unidade}</td>
-                        <td>${item.quantidade_atual} ${item.unidade}</td>
-                        <td>${item.unidade}</td>
-                    </tr>
-                `).join('');
-
-                // Exibir status
-                statusDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        ${result.updated} itens processados com sucesso!
-                        ${result.data.length - result.updated > 0 ? 
-                            `(${result.data.length - result.updated} novos itens)` : ''}
-                    </div>
-                `;
-                resultDiv.style.display = 'block';
-                
-                // Atualizar a página após 3 segundos
-                setTimeout(() => window.location.reload(), 3000);
-                
-            } else {
-                throw new Error(result.error || 'Erro desconhecido');
-            }
-            
-        } catch (error) {
-            console.error('Erro:', error);
-            statusDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>Erro:</strong> ${error.message}
-                </div>
-            `;
-            resultDiv.style.display = 'none';
-        }
-    });
-});
-</script>
 {% endblock %}
