@@ -28,7 +28,6 @@ def estoque():
         itens=Item.query.order_by(Item.nome).all()
     )
 
-# CRUD de Itens
 @dashboard_bp.route('/adicionar_item', methods=['GET', 'POST'])
 @login_required
 def adicionar_item():
@@ -80,7 +79,24 @@ def remover_item(item_id):
         flash(f'Erro ao remover item: {str(e)}', 'danger')
     return redirect(url_for('dashboard.estoque'))
 
-# Upload e OCR (Correção de transação e regex)
+@dashboard_bp.route('/atualizar_estoque/<int:item_id>', methods=['POST'])
+@login_required
+def atualizar_estoque(item_id):
+    try:
+        item = Item.query.get_or_404(item_id)
+        nova_quantidade = request.form.get('quantidade_atual')
+        if nova_quantidade:
+            item.quantidade_atual = float(nova_quantidade)
+            item.data_atualizacao = datetime.utcnow()
+            db.session.commit()
+            flash('Estoque atualizado com sucesso!', 'success')
+        else:
+            flash('Valor de estoque inválido.', 'warning')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao atualizar estoque: {str(e)}', 'danger')
+    return redirect(url_for('dashboard.estoque'))
+
 @dashboard_bp.route('/upload_tabela', methods=['POST'])
 @login_required
 def upload_tabela():
@@ -119,7 +135,7 @@ def upload_tabela():
         try:
             for _, row in df.iterrows():
                 item = Item.query.filter_by(nome=row['nome']).first()
-                
+
                 if item:
                     item.quantidade_minima = row['quantidade_minima']
                     item.quantidade_atual = row['quantidade_atual']
@@ -131,7 +147,8 @@ def upload_tabela():
                         nome=row['nome'],
                         quantidade_minima=row['quantidade_minima'],
                         quantidade_atual=row['quantidade_atual'],
-                        unidade=row['unidade']
+                        unidade=row['unidade'],
+                        data_atualizacao=datetime.utcnow()
                     )
                     db.session.add(novo_item)
                     novos_itens += 1
@@ -140,7 +157,9 @@ def upload_tabela():
             
         except Exception as e:
             db.session.rollback()
-            raise
+            current_app.logger.error(f"Erro ao atualizar/inserir dados: {e}", exc_info=True)
+            flash(f'Erro ao processar itens: {str(e)}', 'danger')
+            return redirect(url_for('dashboard.estoque'))
 
         os.remove(filepath)
         

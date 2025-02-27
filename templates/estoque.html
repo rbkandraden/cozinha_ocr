@@ -46,7 +46,7 @@
                 <tr class="{% if item.quantidade_atual < item.quantidade_minima %}table-danger{% endif %}">
                   <td>{{ item.id }}</td>
                   <td>{{ item.nome }}</td>
-                  <td>{{ "%.2f"|format(item.quantidade_minima) }} {{ item.unidade }}</td>
+                  <td>{{ "%.2f"|format(item.quantidade_minima) }}</td>
                   <td>
                     <form method="POST" action="{{ url_for('dashboard.atualizar_estoque', item_id=item.id) }}" class="d-flex align-items-center">
                       <input type="number" 
@@ -61,7 +61,7 @@
                     </form>
                   </td>
                   <td>{{ item.unidade }}</td>
-                  <td>{{ item.data_atualizacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                  <td>{{ item.data_atualizacao.strftime('%d/%m/%Y %H:%M') if item.data_atualizacao else 'Nunca' }}</td>
                   <td>
                     <a href="{{ url_for('dashboard.editar_item', item_id=item.id) }}" 
                        class="btn btn-sm" 
