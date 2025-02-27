@@ -1,5 +1,7 @@
 from PIL import Image, ImageFile
 import pytesseract
+import cv2
+import numpy as np
 import os
 import re
 import pandas as pd
@@ -19,20 +21,23 @@ class OCRProcessor:
     def process_inventory_table(self, image_path):
         """Processa imagem de tabela de estoque"""
         try:
-            custom_config = r'--oem 3 --psm 6 -l por+eng'
-            img = self._safe_open_image(image_path)
+            custom_config = r'--oem 1 --psm 4 -l por+eng'
+            img = self._preprocess_image(image_path)
             text = pytesseract.image_to_string(img, config=custom_config)
             return self._parse_inventory_text(text)
         except Exception as e:
             raise RuntimeError(f"Erro no OCR: {str(e)}")
 
-    def _safe_open_image(self, image_path):
-        """Abre e redimensiona imagens grandes"""
+    def _preprocess_image(self, image_path):
+        """Pré-processa a imagem para melhorar o OCR"""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", Image.DecompressionBombWarning)
-            img = Image.open(image_path)
-            if img.width > 3840 or img.height > 2160:
-                img = img.resize((img.width//2, img.height//2), Image.LANCZOS)
+            
+            img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+            img = cv2.resize(img, (img.shape[1]//2, img.shape[0]//2), interpolation=cv2.INTER_AREA)
+            img = cv2.GaussianBlur(img, (5, 5), 0)
+            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+            
             return img
 
     def _parse_inventory_text(self, text):
@@ -48,10 +53,13 @@ class OCRProcessor:
             r'(\d+[\.,]?\d*)\s*([A-Za-z]{1,4})[\s|]+'    # Mínimo e unidade
             r'(\d+[\.,]?\d*)\s*([A-Za-z]{1,4})'          # Estoque e unidade
         )
-
+        
+        stopwords = {"contagem", "responsavel", "pagina", "estoque central"}
+        
         for line in lines:
-            line = line.strip()
-            if any(x in line.lower() for x in ['contagem', 'responsavel', 'pagina', 'estoque central']):
+            line = re.sub(r'[^A-Za-z0-9À-ú\s|,.-]', '', line).strip()
+            
+            if any(x in line.lower() for x in stopwords):
                 continue
             
             match = pattern.search(line)
