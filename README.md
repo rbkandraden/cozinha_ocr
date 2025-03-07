@@ -1,4 +1,5 @@
 Sistema de Gestão de Estoque Automatizado
+
 Este projeto é um sistema de gestão de estoque desenvolvido para automatizar o processo de análise de planilhas. A solução permite que a usuária faça upload de imagens das planilhas, que são processadas e organizadas automaticamente, tornando a gestão do estoque mais eficiente e eliminando a necessidade de análise manual.
 
 🚀 Funcionalidades
