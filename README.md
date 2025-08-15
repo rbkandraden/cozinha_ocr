@@ -1,14 +1,14 @@
 [# Sistema Cozinha OCR
 
-> **Nota Pessoal:** Este projeto foi iniciado por mim (Rebeca Andrade) sem nenhuma experiência prévia em programação. A Maria Clara, que já tinha experiência, me incentivou a aprender na prática, jogando o desafio para mim e dizendo "se vire" como método de aprendizado. Todo o desenvolvimento foi um grande exercício de pesquisa, tentativa e erro, e evolução real de quem estava começando do zero.
+> **Nota Pessoal:** Este projeto foi iniciado por mim (Rebecca Andrade) sem nenhuma experiência prévia em programação. A Maria Clara, que já tinha experiência, me incentivou a aprender na prática, jogando o desafio para mim e dizendo "se vire" como método de aprendizado. Todo o desenvolvimento foi um grande exercício de pesquisa, tentativa e erro, e evolução real de quem estava começando do zero.
 
 Sistema de Gestão de Estoque e Usuários para Cozinha, automatizando o processamento de planilhas a partir de imagens.
 ________________________________________
 Histórico do Projeto
 Este sistema nasceu a partir do Wayne Security (Denner Lima e Maria Clara), originalmente focado em segurança.
-•	NordHaus: primeira versão adaptada por Maria Clara e Rebeca Andrade, explorando a base existente e fazendo ajustes iniciais.
+•	NordHaus: primeira versão adaptada por Maria Clara e Rebecca Andrade, explorando a base existente e fazendo ajustes iniciais.
 •	Cozinha OCR: segunda versão, com melhorias funcionais, integração de OCR para leitura de notas/imagens, upload de fotos, scripts auxiliares, ajustes estéticos e branding próprio.
-Resumo: Maria Clara e Rebeca Andrade trabalharam juntas em todas as fases desta evolução, e este projeto é fruto dessa colaboração contínua.
+Resumo: Maria Clara e Rebecca Andrade trabalharam juntas em todas as fases desta evolução, e este projeto é fruto dessa colaboração contínua.
 ________________________________________
 Funcionalidades
 •	Upload de imagens de planilhas
@@ -121,7 +121,7 @@ sistema-cozinha/
 ---
 
 ## :handshake: Contribuição
-Sugestões, críticas e pull requests são bem-vindos! Este projeto é fruto da colaboração entre Maria Clara e Rebeca Andrade e está aberto para quem quiser aprender ou contribuir.
+Sugestões, críticas e pull requests são bem-vindos! Este projeto é fruto da colaboração entre Maria Clara e Rebecca Andrade e está aberto para quem quiser aprender ou contribuir.
 
 ---
 
