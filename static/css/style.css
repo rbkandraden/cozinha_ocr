@@ -2,7 +2,7 @@
 :root {
   --cor-fundo: #2c2322;      /* Cor principal de fundo */
   --cor-primaria: #ceb9af;   /* Cor principal do texto */
-  --cor-secundaria: #7b5b4a; /* Cor de destaque */
+  --cor-secundaria: #de9b37; /* Cor de destaque */
   --cor-terciaria: #948c8c;  /* Cor secundária */
   --cor-quaternaria: #94848c;/* Cor de realce */
 }
@@ -13,6 +13,8 @@
   margin: 0;
   padding: 0;
 }
+
+
 
 body {
   background-color: var(--cor-fundo);
@@ -72,6 +74,13 @@ body {
 
 .card-header {
   border-bottom: 2px solid var(--cor-secundaria);
+}
+
+/* Regra para o card de Estatísticas utilizando as variáveis definidas em :root */
+.card-header.estatisticas {
+  background-color: var(--cor-secundaria) !important;
+  border-color: var(--cor-secundaria) !important;
+  color: var(--cor-primaria) !important;
 }
 
 .table {
