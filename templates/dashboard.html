@@ -1,110 +1,65 @@
-<!-- templates/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container mt-4">
-    <h2>Dashboard</h2>
-    <p>Bem-vindo ao painel de controle, {{ current_user.username }}!</p>
+<div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Card de Estatísticas -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header estatisticas">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estatísticas</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-8">Total de Itens:</dt>
+                        <dd class="col-4 text-end">{{ total_itens }}</dd>
 
+                        <dt class="col-8">Itens Abaixo do Mínimo:</dt>
+                        <dd class="col-4 text-end text-danger">{{ itens_abaixo_minimo }}</dd>
 
-    <h3 class="mt-4">Visão Geral de Recursos</h3>
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-primary text-white">
-            <h4>Equipamentos</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Equipamentos: 50</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-primary">Gerenciar Equipamentos</a>
-          </div>
+                        <dt class="col-8">Itens para Repor:</dt>
+                        <dd class="col-4 text-end text-warning">{{ itens_para_repor }}</dd>
+                    </dl>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h4>Veículos</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Veículos: 12</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-success">Gerenciar Veículos</a>
-          </div>
+        <!-- Card de Ações Rápidas -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Ações Rápidas</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{{ url_for('dashboard.adicionar_item') }}" class="btn btn-outline-success">
+                        <i class="fas fa-plus-circle"></i> Novo Item
+                    </a>
+                    <a href="{{ url_for('dashboard.estoque') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-boxes"></i> Ver Estoque
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header bg-warning text-white">
-            <h4>Dispositivos de Segurança</h4>
-          </div>
-          <div class="card-body">
-            <p>Total de Dispositivos: 25</p>
-            <a href="{{ url_for('auth.admin_panel') }}" class="btn btn-warning">Gerenciar Dispositivos</a>
-          </div>
+        <!-- Card de Uploads -->
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-import"></i> Atualização por OCR</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('dashboard.upload_tabela') }}" method="POST" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <input type="file" class="form-control" name="file" accept="image/*" required>
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-upload"></i> Enviar
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Formatos aceitos: PNG, JPG, JPEG</small>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-
-
-    <h3 class="mt-4">Atividades Recentes</h3>
-    <div class="card">
-      <div class="card-header">
-        <h4>Últimas Atividades de Segurança</h4>
-      </div>
-      <div class="card-body">
-        <ul>
-          <li><strong>Manutenção do Equipamento 123:</strong> Realizada em 15/02/2025</li>
-          <li><strong>Revisão do Veículo 5:</strong> Concluída em 12/02/2025</li>
-          <li><strong>Instalação de Dispositivo de Segurança no Setor 3:</strong> Em andamento</li>
-        </ul>
-        <a href="{{ url_for('auth.gerente_panel') }}" class="btn btn-info">Visualizar Atividades Detalhadas</a>
-      </div>
-    </div>
-
-
-    <h3 class="mt-4">Indicadores de Desempenho</h3>
-    <div class="card">
-      <div class="card-header">
-        <h4>Recursos de Segurança</h4>
-      </div>
-      <div class="card-body">
-        <p>Gráfico sobre a quantidade de recursos de segurança disponíveis e em uso.</p>
-        <!-- Possível inserir gráfico usando Chart.js -->
-        <img src="https://via.placeholder.com/600x300.png" class="img-fluid" alt="Gráfico de Indicadores">
-      </div>
-    </div>
-
-    <h3 class="mt-4">Tabela de Recursos</h3>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nome do Recurso</th>
-          <th scope="col">Status</th>
-          <th scope="col">Última Atualização</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Equipamento 001</td>
-          <td>Ativo</td>
-          <td>15/02/2025</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Veículo 005</td>
-          <td>Em Revisão</td>
-          <td>12/02/2025</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Dispositivo 003</td>
-          <td>Instalado</td>
-          <td>14/02/2025</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+</div>
 {% endblock %}

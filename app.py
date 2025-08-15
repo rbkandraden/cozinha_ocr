@@ -1,35 +1,54 @@
 from flask import Flask, redirect, url_for
-from flask_login import LoginManager
 import os
-from models import db, User, bcrypt  
+from extensions import db, configure_extensions
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wayne_security.db'
+def create_app():
+    app = Flask(__name__)
+    
+    # Configurações essenciais
+    app.config.update({
+        'SECRET_KEY': os.getenv('SECRET_KEY', 'dev-key-123'),
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + os.path.join(app.instance_path, 'wayne_security.db'),
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        'ALLOWED_EXTENSIONS': {'png', 'jpg', 'jpeg', 'gif'},
+        'UPLOAD_FOLDER': os.path.join(app.root_path, 'static', 'uploads'),
+        'MAX_CONTENT_LENGTH': 16 * 1024 * 1024  # 16MB
+    })
 
+    # Configurar extensões
+    configure_extensions(app)
 
-db.init_app(app)
-bcrypt.init_app(app)
+    # Garantir estrutura de pastas
+    with app.app_context():
+        # Criar pastas necessárias
+        required_folders = [
+            app.instance_path,
+            app.config['UPLOAD_FOLDER'],
+            os.path.join(app.root_path, 'temp_uploads')
+        ]
+        
+        for folder in required_folders:
+            os.makedirs(folder, exist_ok=True)
 
-login_manager = LoginManager(app)
-login_manager.login_view = 'auth.login'
+        # Inicializar banco de dados
+        from models import User, Item
+        db.create_all()
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+        # Registrar blueprints
+        from routes.auth import bp as auth_bp
+        from routes.dashboard import dashboard_bp
+        
+        app.register_blueprint(auth_bp, url_prefix='/auth')
+        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 
+    # Rota principal
+    @app.route('/')
+    def index():
+        return redirect(url_for('auth.login'))
 
-from routes.auth import bp as auth_bp
-from routes.dashboard import bp as dashboard_bp
+    return app
 
-app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-
-@app.route("/")
-def index():
-    return redirect(url_for("auth.login"))
+app = create_app()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  
     app.run(debug=True)
