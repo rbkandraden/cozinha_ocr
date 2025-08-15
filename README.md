@@ -1,4 +1,4 @@
-# Sistema Cozinha OCR
+[# Sistema Cozinha OCR
 
 > **Nota Pessoal:** Este projeto foi iniciado por mim (Rebeca Andrade) sem nenhuma experiência prévia em programação. A Maria Clara, que já tinha experiência, me incentivou a aprender na prática, jogando o desafio para mim e dizendo "se vire" como método de aprendizado. Todo o desenvolvimento foi um grande exercício de pesquisa, tentativa e erro, e evolução real de quem estava começando do zero.
 
@@ -136,3 +136,4 @@ Sugestões, críticas e pull requests são bem-vindos! Este projeto é fruto da 
 ---
 
 Projeto em constante evolução. Obrigado por visitar!
+](https://github.com/rbkandraden/cozinha_ocr/blob/main/README.md)
